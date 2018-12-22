@@ -1,51 +1,89 @@
-import React, { Component } from "react";
-import { withStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import CardMedia from "@material-ui/core/CardMedia";
-import CardContent from "@material-ui/core/CardContent";
-import CardActions from "@material-ui/core/CardActions";
-import Avatar from "@material-ui/core/Avatar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import ShareIcon from "@material-ui/icons/Share";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import red from "@material-ui/core/colors/red";
-
-const styles = theme => ({
-  card: {
-    maxWidth: 400
-  },
-  actions: {
-    display: "flex"
-  },
-  expand: {
-    transform: "rotate(0deg)",
-    transition: theme.transitions.create("transform", {
-      duration: theme.transitions.duration.shortest
-    }),
-    marginLeft: "auto",
-    [theme.breakpoints.up("sm")]: {
-      marginRight: -8
-    }
-  },
-  expandOpen: {
-    transform: "rotate(180deg)"
-  },
-  avatar: {
-    backgroundColor: red[500]
-  }
-});
+import React, { Component, Fragment } from "react";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import ListItemText from "@material-ui/core/ListItemText";
+import Switch from "@material-ui/core/Switch";
+import { ListItemIcon, Tooltip } from "@material-ui/core";
+import CheckBoxIcon from "@material-ui/icons/WifiOutlined";
+import ErrorIcon from "@material-ui/icons/WifiOffOutlined";
+import Slider from "@material-ui/lab/Slider";
+import { LightsService } from "../service/LightsService";
+import { State } from "../resource/State";
 
 class LightCard extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { light: this.props.light, bri: this.props.light.state.bri };
+  }
+
+  changeState = light => {
+    LightsService.changeState(light, new State(!light.state.on)).then(() => {
+      LightsService.getLight(light).then(res => {
+        const newState = res.data;
+        newState.id = light.id;
+        this.setState({ light: newState });
+      });
+    });
+  };
+
+  handleLightBrightnessChange = (event, value) => {
+    this.setState({ bri: value });
+  };
+
+  handleLightBrightnessOnDragEnd = () => {
+    const {
+      bri,
+      light,
+      light: { id }
+    } = this.state;
+
+    LightsService.changeState(light, new State(true, bri)).then(() => {
+      LightsService.getLight(light).then(res => {
+        const newState = res.data;
+        newState.id = id;
+        this.setState({ light: newState });
+      });
+    });
+  };
+
   render() {
-    const { light, classes } = this.props;
+    const { light, bri } = this.state;
 
     return (
-      
+      <Fragment>
+        <ListItem key={light.id}>
+          <ListItemIcon>
+            {light.state.reachable ? (
+              <Tooltip title="Reachable">
+                <CheckBoxIcon />
+              </Tooltip>
+            ) : (
+              <Tooltip title="Unreachable">
+                <ErrorIcon />
+              </Tooltip>
+            )}
+          </ListItemIcon>
+          <ListItemText primary={light.name} />
+          <ListItemSecondaryAction>
+            <Switch
+              disabled={!light.state.reachable}
+              onChange={() => {
+                this.changeState(light);
+              }}
+              checked={light.state.on}
+            />
+          </ListItemSecondaryAction>
+        </ListItem>
+        <Slider
+          max={254}
+          value={bri}
+          onChange={this.handleLightBrightnessChange}
+          onDragEnd={this.handleLightBrightnessOnDragEnd}
+        />
+      </Fragment>
     );
   }
 }
 
-export default withStyles(styles)(LightCard);
+export default LightCard;

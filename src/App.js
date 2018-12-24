@@ -3,6 +3,7 @@ import { LightsService } from "./service/LightsService";
 import List from "@material-ui/core/List";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import LightListItem from "./components/LightListItem";
+import BottomAppBar from "./components/BottomAppBar";
 
 class App extends Component {
   state = { lights: [] };
@@ -40,6 +41,7 @@ class App extends Component {
             />
           ))}
         </List>
+        <BottomAppBar />
       </div>
     );
   }

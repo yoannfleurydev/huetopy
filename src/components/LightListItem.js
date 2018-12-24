@@ -3,12 +3,24 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
 import Switch from "@material-ui/core/Switch";
-import { ListItemIcon, Tooltip } from "@material-ui/core";
+import {
+  ListItemIcon,
+  Tooltip,
+  withStyles,
+  withTheme
+} from "@material-ui/core";
 import CheckBoxIcon from "@material-ui/icons/WifiOutlined";
 import ErrorIcon from "@material-ui/icons/WifiOffOutlined";
-import Slider from "@material-ui/lab/Slider";
+import { Slider } from "material-ui-slider";
 import { LightsService } from "../service/LightsService";
 import { State } from "../resource/State";
+
+const styles = {
+  root: {
+    width: "90%",
+    margin: "auto"
+  }
+};
 
 class LightCard extends Component {
   constructor(props) {
@@ -27,7 +39,7 @@ class LightCard extends Component {
     });
   };
 
-  handleLightBrightnessChange = (event, value) => {
+  handleLightBrightnessChange = value => {
     this.setState({ bri: value });
   };
 
@@ -49,6 +61,7 @@ class LightCard extends Component {
 
   render() {
     const { light, bri } = this.state;
+    const { classes, theme } = this.props;
 
     return (
       <Fragment>
@@ -75,15 +88,19 @@ class LightCard extends Component {
             />
           </ListItemSecondaryAction>
         </ListItem>
-        <Slider
-          max={254}
-          value={bri}
-          onChange={this.handleLightBrightnessChange}
-          onDragEnd={this.handleLightBrightnessOnDragEnd}
-        />
+        <div className={classes.root}>
+          <Slider
+            max={254}
+            value={bri}
+            color={theme.palette.secondary.main}
+            disabled={!light.state.reachable}
+            onChange={this.handleLightBrightnessChange}
+            onChangeComplete={this.handleLightBrightnessOnDragEnd}
+          />
+        </div>
       </Fragment>
     );
   }
 }
 
-export default LightCard;
+export default withTheme()(withStyles(styles)(LightCard));

@@ -26,15 +26,21 @@ class LightCard extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { light: this.props.light, bri: this.props.light.state.bri };
+    this.state = {
+      light: this.props.light,
+      bri: this.props.light.state.bri,
+      loading: false
+    };
   }
 
   changeState = light => {
-    LightsService.changeState(light, new State(!light.state.on)).then(() => {
-      LightsService.getLight(light).then(res => {
-        const newState = res.data;
-        newState.id = light.id;
-        this.setState({ light: newState });
+    this.setState({ loading: true }, () => {
+      LightsService.changeState(light, new State(!light.state.on)).then(() => {
+        LightsService.getLight(light).then(res => {
+          const newState = res.data;
+          newState.id = light.id;
+          this.setState({ light: newState, loading: false });
+        });
       });
     });
   };
@@ -50,18 +56,22 @@ class LightCard extends Component {
       light: { id }
     } = this.state;
 
-    LightsService.changeState(light, new State(true, bri)).then(() => {
-      LightsService.getLight(light).then(res => {
-        const newState = res.data;
-        newState.id = id;
-        this.setState({ light: newState });
+    this.setState({ loading: true }, () => {
+      LightsService.changeState(light, new State(true, bri)).then(() => {
+        LightsService.getLight(light).then(res => {
+          const newState = res.data;
+          newState.id = id;
+          this.setState({ light: newState, loading: false });
+        });
       });
     });
   };
 
   render() {
-    const { light, bri } = this.state;
+    const { light, bri, loading } = this.state;
     const { classes, theme } = this.props;
+
+    const disabled = !light.state.reachable || loading;
 
     return (
       <Fragment>
@@ -80,7 +90,7 @@ class LightCard extends Component {
           <ListItemText primary={light.name} />
           <ListItemSecondaryAction>
             <Switch
-              disabled={!light.state.reachable}
+              disabled={disabled}
               onChange={() => {
                 this.changeState(light);
               }}
@@ -93,7 +103,7 @@ class LightCard extends Component {
             max={254}
             value={bri}
             color={theme.palette.secondary.main}
-            disabled={!light.state.reachable}
+            disabled={disabled}
             onChange={this.handleLightBrightnessChange}
             onChangeComplete={this.handleLightBrightnessOnDragEnd}
           />

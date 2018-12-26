@@ -16,4 +16,12 @@ export class LightsService {
       state
     );
   }
+
+  static changeStates(lights = [], state = { on: false }) {
+    const returns = [];
+
+    lights.map(light => returns.push(this.changeState(light, state)));
+
+    return Axios.all(returns);
+  }
 }

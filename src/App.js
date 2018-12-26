@@ -41,7 +41,7 @@ class App extends Component {
             />
           ))}
         </List>
-        <BottomAppBar />
+        <BottomAppBar lights={lights} lightsState={this.lightsState} />
       </div>
     );
   }

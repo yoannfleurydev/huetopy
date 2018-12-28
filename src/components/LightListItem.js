@@ -33,6 +33,12 @@ class LightCard extends Component {
     };
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.light !== prevProps.light) {
+      this.setState({ light: this.props.light });
+    }
+  }
+
   changeState = light => {
     this.setState({ loading: true }, () => {
       LightsService.changeState(light, new State(!light.state.on)).then(() => {

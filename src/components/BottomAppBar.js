@@ -4,7 +4,8 @@ import {
   Toolbar,
   IconButton,
   withStyles,
-  Snackbar
+  Snackbar,
+  Tooltip
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import BrightnessLowIcon from "@material-ui/icons/BrightnessLowOutlined";
@@ -91,12 +92,16 @@ class BottomAppBar extends Component {
               <MenuIcon />
             </IconButton>
             <div>
-              <IconButton color="inherit" onClick={this.turnOffAllLights}>
-                <BrightnessLowIcon />
-              </IconButton>
-              <IconButton color="inherit" onClick={this.turnOnAllLights}>
-                <BrightnessHighIcon />
-              </IconButton>
+              <Tooltip title="Turn off all lights">
+                <IconButton color="inherit" onClick={this.turnOffAllLights}>
+                  <BrightnessLowIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Turn on all lights">
+                <IconButton color="inherit" onClick={this.turnOnAllLights}>
+                  <BrightnessHighIcon />
+                </IconButton>
+              </Tooltip>
             </div>
           </Toolbar>
         </AppBar>

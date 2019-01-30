@@ -4,6 +4,13 @@ import List from "@material-ui/core/List";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import LightListItem from "./components/LightListItem";
 import BottomAppBar from "./components/BottomAppBar";
+import { withStyles } from "@material-ui/core";
+
+const styles = {
+  list: {
+    paddingBottom: 50
+  }
+};
 
 class App extends Component {
   state = { lights: [] };
@@ -28,11 +35,15 @@ class App extends Component {
   };
 
   render() {
+    const { classes } = this.props;
     const { lights } = this.state;
 
     return (
       <div>
-        <List subheader={<ListSubheader>Lights</ListSubheader>}>
+        <List
+          subheader={<ListSubheader>Lights</ListSubheader>}
+          className={classes.list}
+        >
           {lights.map(light => (
             <LightListItem
               key={light.id}
@@ -47,4 +58,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withStyles(styles)(App);

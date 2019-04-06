@@ -22,7 +22,7 @@ const styles = {
   }
 };
 
-class LightCard extends Component {
+class LightListItem extends Component {
   constructor(props) {
     super(props);
 
@@ -119,4 +119,4 @@ class LightCard extends Component {
   }
 }
 
-export default withTheme()(withStyles(styles)(LightCard));
+export default withTheme()(withStyles(styles)(LightListItem));

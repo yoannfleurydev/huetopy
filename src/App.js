@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { LightsService } from "./service/LightsService";
 import List from "@material-ui/core/List";
 import ListSubheader from "@material-ui/core/ListSubheader";
@@ -12,50 +12,43 @@ const styles = {
   }
 };
 
-class App extends Component {
-  state = { lights: [] };
+function App({ classes }) {
+  const [lights, setLights] = useState([]);
 
-  componentDidMount() {
-    this.lightsState();
-  }
-
-  lightsState = () => {
+  const lightsState = () => {
     LightsService.getLights().then(res => {
-      const lights = [];
+      const newLights = [];
       // Put the JSON of each light in an array because Philips Hue default is
       // an object.
       Object.keys(res.data).forEach(key => {
         const light = res.data[key];
         light.id = key;
-        lights.push(light);
+        newLights.push(light);
       });
 
-      this.setState({ lights });
+      setLights(newLights);
     });
   };
 
-  render() {
-    const { classes } = this.props;
-    const { lights } = this.state;
+  lightsState();
 
-    return (
-      <div>
-        <List
-          subheader={<ListSubheader>Lights</ListSubheader>}
-          className={classes.list}
-        >
-          {lights.map(light => (
-            <LightListItem
-              key={light.id}
-              light={light}
-              lightsState={this.lightsState}
-            />
-          ))}
-        </List>
-        <BottomAppBar lights={lights} onChange={this.lightsState} />
-      </div>
-    );
-  }
+  return (
+    <React.Fragment>
+      <List
+        subheader={<ListSubheader>Lights</ListSubheader>}
+        className={classes.list}
+      >
+        {lights.map(light => (
+          <LightListItem
+            key={light.id}
+            light={light}
+            lightsState={lightsState}
+          />
+        ))}
+      </List>
+      <BottomAppBar lights={lights} onChange={lightsState} />
+    </React.Fragment>
+  );
 }
 
 export default withStyles(styles)(App);

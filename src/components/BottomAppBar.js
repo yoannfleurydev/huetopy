@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -24,90 +24,81 @@ const styles = {
   }
 };
 
-class BottomAppBar extends Component {
-  state = { snackbarOpen: false, snackbarMessage: "" };
+function BottomAppBar({ lights, onChange, classes }) {
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   /**
    * on is the attribute in Philips Hue API that tells the light to be on or off
    */
-  changeGlobalStateOn = (on = false) => {
-    const { lights, onChange } = this.props;
-
+  const changeGlobalStateOn = (on = false) => {
     LightsService.changeStates(lights, { on }).then(() => {
-      const snackbarMessage = `Lights turned ${on ? "on" : "off"}`;
-
-      this.setState({ snackbarOpen: true, snackbarMessage });
+      setSnackbarMessage(`Lights turned ${on ? "on" : "off"}`);
+      setSnackbarOpen(true);
       onChange();
     });
   };
 
-  handleClose = (event, reason) => {
+  const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
 
-    this.setState({ snackbarOpen: false });
+    setSnackbarOpen(false);
   };
 
-  turnOffAllLights = () => {
-    this.changeGlobalStateOn(false);
-  };
-
-  turnOnAllLights = () => {
-    this.changeGlobalStateOn(true);
-  };
-
-  render() {
-    const { classes } = this.props;
-    const { snackbarOpen, snackbarMessage } = this.state;
-
-    return (
-      <Fragment>
-        <Snackbar
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center"
-          }}
-          open={snackbarOpen}
-          autoHideDuration={3000}
-          onClose={this.handleClose}
-          ContentProps={{
-            "aria-describedby": "message-id"
-          }}
-          message={<span id="message-id">{snackbarMessage}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              onClick={this.handleClose}
-            >
-              <CloseIcon />
-            </IconButton>
-          ]}
-        />
-        <AppBar position="fixed" color="primary" className={classes.appBar}>
-          <Toolbar className={classes.toolbar}>
-            <IconButton color="inherit" aria-label="Open drawer">
-              <MenuIcon />
-            </IconButton>
-            <div>
-              <Tooltip title="Turn off all lights">
-                <IconButton color="inherit" onClick={this.turnOffAllLights}>
-                  <BrightnessLowIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Turn on all lights">
-                <IconButton color="inherit" onClick={this.turnOnAllLights}>
-                  <BrightnessHighIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </Toolbar>
-        </AppBar>
-      </Fragment>
-    );
-  }
+  return (
+    <React.Fragment>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center"
+        }}
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        ContentProps={{
+          "aria-describedby": "message-id"
+        }}
+        message={<span id="message-id">{snackbarMessage}</span>}
+        action={[
+          <IconButton
+            key="close"
+            aria-label="Close"
+            color="inherit"
+            onClick={handleClose}
+          >
+            <CloseIcon />
+          </IconButton>
+        ]}
+      />
+      <AppBar position="fixed" color="primary" className={classes.appBar}>
+        <Toolbar className={classes.toolbar}>
+          <IconButton color="inherit" aria-label="Open drawer">
+            <MenuIcon />
+          </IconButton>
+          <div>
+            <Tooltip title="Turn off all lights">
+              <IconButton
+                color="inherit"
+                onClick={() => changeGlobalStateOn(false)}
+              >
+                <BrightnessLowIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Turn on all lights">
+              <IconButton
+                color="inherit"
+                onClick={() => changeGlobalStateOn(true)}
+              >
+                <BrightnessHighIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </Toolbar>
+      </AppBar>
+    </React.Fragment>
+  );
 }
 
 export default withStyles(styles)(BottomAppBar);
